@@ -1,8 +1,43 @@
-<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
-        <title>Tags - Tag - cr4ck3d</title>
+        <title>Tags on Cr4CK3DD</title>
         <link>http://localhost:1313/tags/</link>
-        <description>Tags - Tag - cr4ck3d</description>
-        <generator>Hugo -- gohugo.io</generator><language>en</language><managingEditor>cr4ck3d@gmail.com (cr4ck3d)</managingEditor>
-            <webMaster>cr4ck3d@gmail.com (cr4ck3d)</webMaster><atom:link href="http://localhost:1313/tags/" rel="self" type="application/rss+xml" /></channel>
+        <description>Recent content in Tags on Cr4CK3DD</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en-us</language>
+        <lastBuildDate>Sat, 13 Apr 2024 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Investigation</title>
+        <link>http://localhost:1313/tags/investigation/</link>
+        <pubDate>Sat, 13 Apr 2024 00:00:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/tags/investigation/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Malware Analysis</title>
+        <link>http://localhost:1313/tags/malware-analysis/</link>
+        <pubDate>Sat, 13 Apr 2024 00:00:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/tags/malware-analysis/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Pikabot</title>
+        <link>http://localhost:1313/tags/pikabot/</link>
+        <pubDate>Sat, 13 Apr 2024 00:00:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/tags/pikabot/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Threat Actor</title>
+        <link>http://localhost:1313/tags/threat-actor/</link>
+        <pubDate>Sat, 13 Apr 2024 00:00:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/tags/threat-actor/</guid>
+        <description></description>
+        </item>
+        
+    </channel>
 </rss>

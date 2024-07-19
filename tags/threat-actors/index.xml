@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Threat Actors on Cr4CK3DD</title>
+        <link>http://localhost:1313/tags/threat-actors/</link>
+        <description>Recent content in Threat Actors on Cr4CK3DD</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en-us</language>
+        <lastBuildDate>Sun, 06 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/threat-actors/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>PikaBot: Unmasking Its Deep Secrets</title>
+        <link>http://localhost:1313/p/hello-world/</link>
+        <pubDate>Sun, 06 Mar 2022 00:00:00 +0000</pubDate>
+        
+        <guid>http://localhost:1313/p/hello-world/</guid>
+        <description>&lt;img src="http://localhost:1313/p/hello-world/cover.jpg" alt="Featured image of post PikaBot: Unmasking Its Deep Secrets" /&gt;&lt;h1 id=&#34;overview&#34;&gt;Overview
+&lt;/h1&gt;&lt;p&gt;PikaBot is a malware loader, widely distributed since February 2023, that is used by Initial Access Brokers (IABs) to establish an initial foothold within a victim’s networks and to distribute additional payloads such as Cobalt Strike and Meterpreter.
+Since its emergence in early 2023, PikaBot appears to be in active development, with a new major version released in February 2024. The malware employs advanced anti-analysis techniques to evade detection and harden analysis, including system checks, indirect syscalls, encryption of next-stage and strings, and dynamic API resolving.&lt;/p&gt;
+&lt;h1 id=&#34;infection-chain&#34;&gt;Infection chain
+&lt;/h1&gt;&lt;p&gt;The infection chain starts with the victim receiving an ISO image attached to an email. The ISO image contains a legitimate Windows Write file (write.exe) and a DLL (edputil.dll). After the victim clicks on write.exe, the side-loaded DLL downloads the packed Pikabot DLL. Once unpacked, the Pikabot loader will decrypt and inject the core module into the created process &amp;ldquo;ctfmon.exe&amp;rdquo;.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://localhost:1313/image&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;infection-chain.jpeg&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Figure 1. Redline Stealer Infection Chain&lt;/em&gt;&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

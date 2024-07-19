@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Overview PikaBot is a malware loader, widely distributed since February 2023, that is used by Initial Access Brokers (IABs) to establish an initial foothold within a victim’s networks and to distribute additional payloads such as Cobalt Strike and Meterpreter. Since its emergence in early 2023, PikaBot appears to be in active development, with a new major version released in February 2024. The malware employs advanced anti-analysis techniques to evade detection and harden analysis, including system checks, indirect syscalls, encryption of next-stage and strings, and dynamic API resolving.">
+<title>PikaBot: Unmasking Its Deep Secrets</title>
+
+<link rel='canonical' href='http://localhost:1313/p/hello-world/'>
+
+<link rel="stylesheet" href="/scss/style.min.0304c6baf04e01a8fe70693791cb744d56a3578a3120a8796cefc66825aa39c7.css"><meta property='og:title' content="PikaBot: Unmasking Its Deep Secrets">
+<meta property='og:description' content="Overview PikaBot is a malware loader, widely distributed since February 2023, that is used by Initial Access Brokers (IABs) to establish an initial foothold within a victim’s networks and to distribute additional payloads such as Cobalt Strike and Meterpreter. Since its emergence in early 2023, PikaBot appears to be in active development, with a new major version released in February 2024. The malware employs advanced anti-analysis techniques to evade detection and harden analysis, including system checks, indirect syscalls, encryption of next-stage and strings, and dynamic API resolving.">
+<meta property='og:url' content='http://localhost:1313/p/hello-world/'>
+<meta property='og:site_name' content='Cr4CK3DD'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Investigation' /><meta property='article:tag' content='Malware Analysis' /><meta property='article:tag' content='Threat Actor' /><meta property='article:tag' content='Pikabot' /><meta property='article:published_time' content='2024-04-13T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-04-13T00:00:00&#43;00:00'/><meta property='og:image' content='http://localhost:1313/p/hello-world/cover.jpg' />
+<meta name="twitter:title" content="PikaBot: Unmasking Its Deep Secrets">
+<meta name="twitter:description" content="Overview PikaBot is a malware loader, widely distributed since February 2023, that is used by Initial Access Brokers (IABs) to establish an initial foothold within a victim’s networks and to distribute additional payloads such as Cobalt Strike and Meterpreter. Since its emergence in early 2023, PikaBot appears to be in active development, with a new major version released in February 2024. The malware employs advanced anti-analysis techniques to evade detection and harden analysis, including system checks, indirect syscalls, encryption of next-stage and strings, and dynamic API resolving."><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='http://localhost:1313/p/hello-world/cover.jpg' />
+  
+
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu2f8ff2cb1b7b0226f447817c82c5c4ce_160004_300x0_resize_q75_box.jpeg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Cr4CK3DD</a></h1>
+            <h2 class="site-description">Blueteam, Redteam</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/Cr4CK3DD'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#unpacking">Unpacking</a></li>
+    <li><a href="#loader">Loader</a>
+      <ol>
+        <li><a href="#indirect-syscalls">Indirect Syscalls</a></li>
+        <li><a href="#anti-debugging">Anti-debugging</a></li>
+        <li><a href="#dynamic-api-resolving">Dynamic API Resolving</a></li>
+        <li><a href="#process-hollowing">Process Hollowing</a></li>
+      </ol>
+    </li>
+    <li><a href="#core-module">Core Module</a></li>
+    <li><a href="#iocs">IOCs</a></li>
+    <li><a href="#yara">YARA</a></li>
+    <li><a href="#download">Download</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/hello-world/">
+                <img src="/p/hello-world/cover_hu96127eeb90c035c3fbe3b6abf967bc7d_353782_800x0_resize_q75_box.jpg"
+                        srcset="/p/hello-world/cover_hu96127eeb90c035c3fbe3b6abf967bc7d_353782_800x0_resize_q75_box.jpg 800w, /p/hello-world/cover_hu96127eeb90c035c3fbe3b6abf967bc7d_353782_1600x0_resize_q75_box.jpg 1600w"
+                        width="800" 
+                        height="800" 
+                        loading="lazy"
+                        alt="Featured image of post PikaBot: Unmasking Its Deep Secrets" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/malware-analysis/" style="background-color: #2a9d8f; color: #fff;">
+                Malware Analysis
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/hello-world/">PikaBot: Unmasking Its Deep Secrets</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Apr 13, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    5 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="overview">Overview
+</h1><p>PikaBot is a malware loader, widely distributed since February 2023, that is used by Initial Access Brokers (IABs) to establish an initial foothold within a victim’s networks and to distribute additional payloads such as Cobalt Strike and Meterpreter.
+Since its emergence in early 2023, PikaBot appears to be in active development, with a new major version released in February 2024. The malware employs advanced anti-analysis techniques to evade detection and harden analysis, including system checks, indirect syscalls, encryption of next-stage and strings, and dynamic API resolving.</p>
+<h1 id="infection-chain">Infection chain
+</h1><p>The infection chain starts with the victim receiving an ISO image attached to an email. The ISO image contains a legitimate Windows Write file (write.exe) and a DLL (edputil.dll). After the victim clicks on write.exe, the side-loaded DLL downloads the packed Pikabot DLL. Once unpacked, the Pikabot loader will decrypt and inject the core module into the created process &ldquo;ctfmon.exe&rdquo;.</p>
+<p><img src="/p/hello-world/infection-chain.jpeg"
+	width="1374"
+	height="335"
+	srcset="/p/hello-world/infection-chain_hu555fa390fac6524c892aea22c8895429_90254_480x0_resize_q75_box.jpeg 480w, /p/hello-world/infection-chain_hu555fa390fac6524c892aea22c8895429_90254_1024x0_resize_q75_box.jpeg 1024w"
+	loading="lazy"
+	
+		alt="Pikabot Infection Chain"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="410"
+		data-flex-basis="984px"
+	
+></p>
+<h1 id="analysis">Analysis
+</h1><p>The side-loaded DLL download and run Pikabot DLL.</p>
+<p><img src="/p/hello-world/download-pikabot.png"
+	width="969"
+	height="243"
+	srcset="/p/hello-world/download-pikabot_hu5b9af827d12c2cc5188dfd68d2e0d141_64248_480x0_resize_box_3.png 480w, /p/hello-world/download-pikabot_hu5b9af827d12c2cc5188dfd68d2e0d141_64248_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+		alt="Download and run DLL"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="398"
+		data-flex-basis="957px"
+	
+></p>
+<h2 id="unpacking">Unpacking
+</h2><p>The downloaded DLL will decrypt and reflectively load the Pikabot Loader from the resource section into the current process memory.</p>
+<p><img src="/p/hello-world/decrypting-pikabot.png"
+	width="1171"
+	height="132"
+	srcset="/p/hello-world/decrypting-pikabot_hu8c7a2097b1c78585f6c9d1a80d00b81f_14475_480x0_resize_box_3.png 480w, /p/hello-world/decrypting-pikabot_hu8c7a2097b1c78585f6c9d1a80d00b81f_14475_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="887"
+		data-flex-basis="2129px"
+	
+></p>
+<p><img src="/p/hello-world/copy-headers.png"
+	width="1169"
+	height="113"
+	srcset="/p/hello-world/copy-headers_hu498ca4e06524420f69462cfc25090ea8_13259_480x0_resize_box_3.png 480w, /p/hello-world/copy-headers_hu498ca4e06524420f69462cfc25090ea8_13259_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="1034"
+		data-flex-basis="2482px"
+	
+></p>
+<p><img src="/p/hello-world/copy-sections.png"
+	width="1170"
+	height="346"
+	srcset="/p/hello-world/copy-sections_huf42dede1c7a56a3a1c459c6c379f8357_55102_480x0_resize_box_3.png 480w, /p/hello-world/copy-sections_huf42dede1c7a56a3a1c459c6c379f8357_55102_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="338"
+		data-flex-basis="811px"
+	
+></p>
+<p><img src="/p/hello-world/fix-reloc.png"
+	width="1172"
+	height="418"
+	srcset="/p/hello-world/fix-reloc_hu8c0c7079ef0a1b67bccaeaaa4d4ff742_32600_480x0_resize_box_3.png 480w, /p/hello-world/fix-reloc_hu8c0c7079ef0a1b67bccaeaaa4d4ff742_32600_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="280"
+		data-flex-basis="672px"
+	
+></p>
+<p><img src="/p/hello-world/run-stage-2.png"
+	width="1172"
+	height="153"
+	srcset="/p/hello-world/run-stage-2_hubb1e30d9d33c937145e7065a70d1137b_19208_480x0_resize_box_3.png 480w, /p/hello-world/run-stage-2_hubb1e30d9d33c937145e7065a70d1137b_19208_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="766"
+		data-flex-basis="1838px"
+	
+></p>
+<h2 id="loader">Loader
+</h2><h3 id="indirect-syscalls">Indirect Syscalls
+</h3><p>Pikabot used Indirect syscalls to stay under the radar and evade EDR user-land hooking, as well as debugging attempts.</p>
+<p><img src="/p/hello-world/indirect-syscall.png"
+	width="1114"
+	height="786"
+	srcset="/p/hello-world/indirect-syscall_hu3cb99226ca3759ab6e02c243e7c14eda_99039_480x0_resize_box_3.png 480w, /p/hello-world/indirect-syscall_hu3cb99226ca3759ab6e02c243e7c14eda_99039_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+		alt="Indirect syscall"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="141"
+		data-flex-basis="340px"
+	
+></p>
+<h3 id="anti-debugging">Anti-debugging
+</h3><p>The Pikabot Loader runs multiple checks to detect if it’s beign debugged.</p>
+<p><img src="/p/hello-world/anti-debug-check-1.png"
+	width="1101"
+	height="106"
+	srcset="/p/hello-world/anti-debug-check-1_hua54e577990265545c217f689064b5bd2_12632_480x0_resize_box_3.png 480w, /p/hello-world/anti-debug-check-1_hua54e577990265545c217f689064b5bd2_12632_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="1038"
+		data-flex-basis="2492px"
+	
+></p>
+<p><img src="/p/hello-world/anti-debug-check-2.png"
+	width="1346"
+	height="130"
+	srcset="/p/hello-world/anti-debug-check-2_hu938dd749f3ee31dc1ce85906bbf7498f_11681_480x0_resize_box_3.png 480w, /p/hello-world/anti-debug-check-2_hu938dd749f3ee31dc1ce85906bbf7498f_11681_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="1035"
+		data-flex-basis="2484px"
+	
+></p>
+<p><img src="/p/hello-world/anti-debug-check-3.png"
+	width="1101"
+	height="106"
+	srcset="/p/hello-world/anti-debug-check-3_hu68a3c189fa91c401aef7eda58c186083_9672_480x0_resize_box_3.png 480w, /p/hello-world/anti-debug-check-3_hu68a3c189fa91c401aef7eda58c186083_9672_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="1038"
+		data-flex-basis="2492px"
+	
+></p>
+<p><img src="/p/hello-world/anti-debug-check-4.png"
+	width="1363"
+	height="131"
+	srcset="/p/hello-world/anti-debug-check-4_huc3e07a1f70e982bfa708ce53dc876554_7027_480x0_resize_box_3.png 480w, /p/hello-world/anti-debug-check-4_huc3e07a1f70e982bfa708ce53dc876554_7027_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="1040"
+		data-flex-basis="2497px"
+	
+></p>
+<p>It also checks a list of processes. If any of these processes are running, the Pikabot Loader will exit without loading the core module.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">ProcessHacker.exe
+</span></span><span class="line"><span class="cl">tcpview.exe
+</span></span><span class="line"><span class="cl">autorunsc.exe
+</span></span><span class="line"><span class="cl">filemon.exe
+</span></span><span class="line"><span class="cl">procmon.exe
+</span></span><span class="line"><span class="cl">regmon.exe
+</span></span><span class="line"><span class="cl">procexp.exe
+</span></span><span class="line"><span class="cl">idaq.exe
+</span></span><span class="line"><span class="cl">idaq64.exe
+</span></span><span class="line"><span class="cl">x32dbg.exe
+</span></span><span class="line"><span class="cl">x64dbg.exe
+</span></span><span class="line"><span class="cl">Fiddler.exe
+</span></span><span class="line"><span class="cl">httpdebugger.exe
+</span></span><span class="line"><span class="cl">cheatengine-i386.exe
+</span></span><span class="line"><span class="cl">cheatengine-x86_64.exe
+</span></span><span class="line"><span class="cl">cheatengine-x86_64-SSE4-AVX2.exe
+</span></span><span class="line"><span class="cl">LordPE.exe
+</span></span><span class="line"><span class="cl">SysInspector.exe
+</span></span><span class="line"><span class="cl">sniff_hit.exe
+</span></span><span class="line"><span class="cl">windbg.exe
+</span></span><span class="line"><span class="cl">joeboxcontrol.exe
+</span></span><span class="line"><span class="cl">joeboxserver.exe
+</span></span><span class="line"><span class="cl">ResourceHacker.exe
+</span></span><span class="line"><span class="cl">dumpcap.exe
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="dynamic-api-resolving">Dynamic API Resolving
+</h3><p>The Loader will resolve APIs from ntdll and kernel32 by hash, and store them into a global structure</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">struct</span> <span class="n">ctx</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">is_being_debugged</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">LdrLoadDll</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">LdrGetProcedureAddress</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">RtlAllocateHeap</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">RtlFreeHeap</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">RtlDecompressBuffer</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">RtlCreateProcessParametersEx</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">RtlDestroyProcessParameters</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">ExitProcess</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">CheckRemoteDebuggerPresent</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">VirtualAlloc</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">GetThreadContext</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">VirtualFree</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">CreateToolhelp32Snapshot</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">Process32FirstW</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">Process32NextW</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">ntdll</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">kernel32</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">dw1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">core_module_payload</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">core_module_payload_size</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DWORD</span> <span class="n">Teb</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>API hashing algorithm :</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">get_hash</span><span class="p">(</span><span class="nb">str</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">hash</span> <span class="o">=</span> <span class="mh">0x1EC8</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="nb">ord</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mh">0x60</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">hash</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">33</span> <span class="o">*</span> <span class="nb">hash</span><span class="p">)</span> <span class="o">-</span> <span class="mi">32</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">hash</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">33</span> <span class="o">*</span> <span class="nb">hash</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nb">hash</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFF</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="process-hollowing">Process Hollowing
+</h3><p>Pikabot Loader stores the core module in the .data section in chunks encrypted with RC4 and base64-encoded.</p>
+<p><img src="/p/hello-world/chunk-example.png"
+	width="991"
+	height="744"
+	srcset="/p/hello-world/chunk-example_hudb2fbc33a302129b490ca96ccde7be8d_170064_480x0_resize_box_3.png 480w, /p/hello-world/chunk-example_hudb2fbc33a302129b490ca96ccde7be8d_170064_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="133"
+		data-flex-basis="319px"
+	
+></p>
+<p>Pikabot use the combination of <strong>RtlCreateProcessParametersEx</strong>, <strong>NtCreateUserProcess</strong>, <strong>RtlDestroyProcessParameters</strong> to create ctfmon.exe process.</p>
+<p><img src="/p/hello-world/inject-1.png"
+	width="1138"
+	height="258"
+	srcset="/p/hello-world/inject-1_hu80225507e2a48de9bae615ca1d66f091_28139_480x0_resize_box_3.png 480w, /p/hello-world/inject-1_hu80225507e2a48de9bae615ca1d66f091_28139_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="441"
+		data-flex-basis="1058px"
+	
+></p>
+<p><img src="/p/hello-world/inject-3.png"
+	width="1138"
+	height="476"
+	srcset="/p/hello-world/inject-3_hud5174119f66f8fcd145fb104c8455226_33121_480x0_resize_box_3.png 480w, /p/hello-world/inject-3_hud5174119f66f8fcd145fb104c8455226_33121_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="239"
+		data-flex-basis="573px"
+	
+></p>
+<p>After Decompressing the payload with RtlDecompressBuffer, it use Process Hollowing technique to inject the core module into the created process (ctfmon.exe).</p>
+<p><img src="/p/hello-world/decompress-buffer.png"
+	width="1251"
+	height="218"
+	srcset="/p/hello-world/decompress-buffer_huc7aa601d6340cab98d87301148e4c745_26063_480x0_resize_box_3.png 480w, /p/hello-world/decompress-buffer_huc7aa601d6340cab98d87301148e4c745_26063_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="573"
+		data-flex-basis="1377px"
+	
+></p>
+<p><img src="/p/hello-world/inject-4.png"
+	width="1137"
+	height="431"
+	srcset="/p/hello-world/inject-4_huafeacb3598bf457ae1bdaed47e366627_37735_480x0_resize_box_3.png 480w, /p/hello-world/inject-4_huafeacb3598bf457ae1bdaed47e366627_37735_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="263"
+		data-flex-basis="633px"
+	
+></p>
+<p><img src="/p/hello-world/inject-5.png"
+	width="1135"
+	height="337"
+	srcset="/p/hello-world/inject-5_hu4e8c983a1f604555c4ef9ff51d14e492_31378_480x0_resize_box_3.png 480w, /p/hello-world/inject-5_hu4e8c983a1f604555c4ef9ff51d14e492_31378_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="336"
+		data-flex-basis="808px"
+	
+></p>
+<h2 id="core-module">Core Module
+</h2><p>The core module infect the victim machine based on the language identifier using GetUserDefaultLangID. If the LangID is set to Russian (0x419) or Ukranian (0x422), the core module will immediately stop its execution.</p>
+<p><img src="/p/hello-world/check-system-language.png"
+	width="400"
+	height="79"
+	srcset="/p/hello-world/check-system-language_hu649bde02099d7b77ac2ee6e0613d0dbe_9617_480x0_resize_box_3.png 480w, /p/hello-world/check-system-language_hu649bde02099d7b77ac2ee6e0613d0dbe_9617_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+		alt="Check machine LangID"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="506"
+		data-flex-basis="1215px"
+	
+></p>
+<p>The Core Module stores its configuration in the data section, which contains IP addresses, URIs, Pikabot version, and additional HTTP headers.</p>
+<p><img src="/p/hello-world/pikabot-config.png"
+	width="1467"
+	height="803"
+	srcset="/p/hello-world/pikabot-config_hu419fb7933c5cd0107e5ae7d217b72493_112175_480x0_resize_box_3.png 480w, /p/hello-world/pikabot-config_hu419fb7933c5cd0107e5ae7d217b72493_112175_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+		alt="Pikabot config"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="182"
+		data-flex-basis="438px"
+	
+></p>
+<p>The next phase involves collecting victim machine information :</p>
+<ul>
+<li>Retrieves the name of the user associated with the PIKABOT thread.</li>
+<li>Retrieves the computer name.</li>
+<li>Gets processor information.</li>
+<li>Grabs display device information using EnumDisplayDevicesW.</li>
+<li>Retrieves domain controller information using DsGetDcNameW.</li>
+<li>Collects current usage around physical and virtual memory using GlobalMemoryStatusEx.</li>
+<li>Gets the window dimensions using GetWindowRect used to identify sandbox environments.</li>
+<li>Retrieves Windows OS product information using RtlGetVersion.</li>
+<li>Uses CreateToolhelp32Snapshot to retrieve process information.</li>
+</ul>
+<p>The collected victim machine information will be encrypted with random key and roatate it with a random number of bytes. the last 4 byte of the config is the number of roatations.</p>
+<p><img src="/p/hello-world/collected-system-infos.png"
+	width="1138"
+	height="514"
+	srcset="/p/hello-world/collected-system-infos_hu899c315c0ec822ca931590690013c457_247648_480x0_resize_box_3.png 480w, /p/hello-world/collected-system-infos_hu899c315c0ec822ca931590690013c457_247648_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+		alt="Initial request Body"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="221"
+		data-flex-basis="531px"
+	
+></p>
+<p>Pikabot registers the bot by sending previously collected information to a random URI.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">api/auth.revoke
+</span></span><span class="line"><span class="cl">api/apps.permissions.info
+</span></span><span class="line"><span class="cl">api/admin.conversations.restrictAccess.removeGroup
+</span></span><span class="line"><span class="cl">api/admin.emoji.add
+</span></span><span class="line"><span class="cl">api/admin.apps.restrict
+</span></span><span class="line"><span class="cl">api/auth.test
+</span></span><span class="line"><span class="cl">api/admin.conversations.archive
+</span></span><span class="line"><span class="cl">api/admin.conversations.restrictAccess.addGroup
+</span></span><span class="line"><span class="cl">api/apps.event.authorizations.list
+</span></span><span class="line"><span class="cl">api/admin.emoji.addAlias
+</span></span><span class="line"><span class="cl">api/admin.conversations.getConversationPrefs
+</span></span><span class="line"><span class="cl">api/admin.users.setOwner
+</span></span><span class="line"><span class="cl">api/admin.inviteRequests.approved.list
+</span></span><span class="line"><span class="cl">api/admin.conversations.create
+</span></span><span class="line"><span class="cl">api/admin.conversations.inviteBapi/admin.usergroups.listChannels
+</span></span><span class="line"><span class="cl">api/apps.permissions.users.request
+</span></span><span class="line"><span class="cl">api/admin.users.remove
+</span></span><span class="line"><span class="cl">api/admin.conversations.ekm.listOriginalConnectedChannelInfo
+</span></span><span class="line"><span class="cl">api/admin.inviteRequests.denied.list
+</span></span><span class="line"><span class="cl">api/admin.apps.approve
+</span></span><span class="line"><span class="cl">api/admin.users.list
+</span></span><span class="line"><span class="cl">api/admin.emoji.list
+</span></span><span class="line"><span class="cl">api/admin.conversations.rename
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Pikabot enters beaconing state, waiting for commands from the C2 server.</p>
+<p><img src="/p/hello-world/c2-cmds.png"
+	width="792"
+	height="505"
+	srcset="/p/hello-world/c2-cmds_hu648fed2f5674b11f9c99b788b1d5179d_68149_480x0_resize_box_3.png 480w, /p/hello-world/c2-cmds_hu648fed2f5674b11f9c99b788b1d5179d_68149_1024x0_resize_box_3.png 1024w"
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="156"
+		data-flex-basis="376px"
+	
+></p>
+<h2 id="iocs">IOCs
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">---------------------------------------------------------------------
+</span></span><span class="line"><span class="cl">94.72.104[.]77:13724
+</span></span><span class="line"><span class="cl">154.12.236[.]248:13786 	
+</span></span><span class="line"><span class="cl">84.46.240[.]42:2083 	
+</span></span><span class="line"><span class="cl">94.72.104[.]80:5000 	
+</span></span><span class="line"><span class="cl">198.38.94[.]213:2224 		
+</span></span><span class="line"><span class="cl">45.77.63[.]237:22 		
+</span></span><span class="line"><span class="cl">70.34.199[.]64:9785 		
+</span></span><span class="line"><span class="cl">70.34.223[.]164:9785 		
+</span></span><span class="line"><span class="cl">70.34.223[.]164:5000 		
+</span></span><span class="line"><span class="cl">158.247.240[.]58:22 	
+</span></span><span class="line"><span class="cl">154.53.55[.]165:13783 		
+</span></span><span class="line"><span class="cl">209.126.86[.]48:1194 	
+</span></span><span class="line"><span class="cl">---------------------------------------------------------------------
+</span></span><span class="line"><span class="cl">yourunitedlaws[.]com
+</span></span><span class="line"><span class="cl">---------------------------------------------------------------------
+</span></span><span class="line"><span class="cl">api/auth.revoke
+</span></span><span class="line"><span class="cl">api/apps.permissions.info
+</span></span><span class="line"><span class="cl">api/admin.conversations.restrictAccess.removeGroup
+</span></span><span class="line"><span class="cl">api/admin.emoji.add
+</span></span><span class="line"><span class="cl">api/admin.apps.restrict
+</span></span><span class="line"><span class="cl">api/auth.test
+</span></span><span class="line"><span class="cl">api/admin.conversations.archive
+</span></span><span class="line"><span class="cl">api/admin.conversations.restrictAccess.addGroup
+</span></span><span class="line"><span class="cl">api/apps.event.authorizations.list
+</span></span><span class="line"><span class="cl">api/admin.emoji.addAlias
+</span></span><span class="line"><span class="cl">api/admin.conversations.getConversationPrefs
+</span></span><span class="line"><span class="cl">api/admin.users.setOwner
+</span></span><span class="line"><span class="cl">api/admin.inviteRequests.approved.list
+</span></span><span class="line"><span class="cl">api/admin.conversations.create
+</span></span><span class="line"><span class="cl">api/admin.conversations.inviteBapi/admin.usergroups.listChannels
+</span></span><span class="line"><span class="cl">api/apps.permissions.users.request
+</span></span><span class="line"><span class="cl">api/admin.users.remove
+</span></span><span class="line"><span class="cl">api/admin.conversations.ekm.listOriginalConnectedChannelInfo
+</span></span><span class="line"><span class="cl">api/admin.inviteRequests.denied.list
+</span></span><span class="line"><span class="cl">api/admin.apps.approve
+</span></span><span class="line"><span class="cl">api/admin.users.list
+</span></span><span class="line"><span class="cl">api/admin.emoji.list
+</span></span><span class="line"><span class="cl">api/admin.conversations.rename
+</span></span><span class="line"><span class="cl">---------------------------------------------------------------------
+</span></span><span class="line"><span class="cl">905a3a144f94a38ac6059759879caec19cff446b98c24bb2035b3293330e03b2
+</span></span><span class="line"><span class="cl">fb8e3ef19f0a3ad298b8d315a716aae1151332c1f097296962a3a04017f940ae
+</span></span><span class="line"><span class="cl">6c5f88c7d2bc6f75264eecc733e74f9b5aa88a54881978dabbc68a8aa5928fc8
+</span></span><span class="line"><span class="cl">cfcf2c1f9f72e719d7a50f0a07c081b8353ae8c04dff2ea9284230539a59d7ac
+</span></span><span class="line"><span class="cl">---------------------------------------------------------------------
+</span></span><span class="line"><span class="cl">{A7C67034-A769-4D94-B727-B30C6C7F66FC}
+</span></span><span class="line"><span class="cl">---------------------------------------------------------------------
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="yara">YARA
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">rule</span> <span class="n">Pikabot_loader</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nl">meta</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    	<span class="n">author</span>      <span class="o">=</span> <span class="s">&#34;Cr4CK3d&#34;</span>
+</span></span><span class="line"><span class="cl">    	<span class="n">description</span> <span class="o">=</span> <span class="s">&#34;Detect Pikabot Loader&#34;</span>
+</span></span><span class="line"><span class="cl">    	<span class="n">created</span>     <span class="o">=</span> <span class="s">&#34;2024-04-19&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nl">strings</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">		<span class="err">$</span><span class="n">NtCreateUserProcess_syscall</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">68</span> <span class="mi">2</span><span class="n">C</span> <span class="n">B1</span> <span class="n">AC</span> <span class="mi">82</span> <span class="n">E8</span> <span class="mf">5F</span> <span class="n">FF</span> <span class="n">FF</span> <span class="n">FF</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="err">$</span><span class="n">rc4_decrypt_core</span> <span class="o">=</span> <span class="p">{</span><span class="n">F7</span> <span class="n">FF</span> <span class="mi">8</span><span class="n">A</span> <span class="mi">84</span> <span class="mi">15</span> <span class="o">??</span> <span class="o">??</span> <span class="o">??</span> <span class="o">??</span> <span class="mi">89</span> <span class="n">D1</span> <span class="mi">8</span><span class="n">A</span> <span class="mi">94</span> <span class="mi">1</span><span class="n">D</span> <span class="o">??</span> <span class="o">??</span> <span class="o">??</span> <span class="o">??</span> <span class="mi">88</span> <span class="mi">94</span> <span class="mi">0</span><span class="n">D</span> <span class="o">??</span> <span class="o">??</span> <span class="o">??</span> <span class="o">??</span> <span class="mi">8</span><span class="n">B</span> <span class="mi">55</span> <span class="mi">08</span> <span class="mi">88</span> <span class="mi">84</span> <span class="mi">1</span><span class="n">D</span> <span class="o">??</span> <span class="o">??</span> <span class="o">??</span> <span class="o">??</span> <span class="mo">02</span> <span class="mi">84</span> <span class="mi">0</span><span class="n">D</span> <span class="o">??</span> <span class="o">??</span> <span class="o">??</span> <span class="o">??</span> <span class="mf">0F</span> <span class="n">B6</span> <span class="n">C0</span> <span class="mi">8</span><span class="n">A</span> <span class="mi">84</span> <span class="mo">05</span> <span class="o">??</span> <span class="o">??</span> <span class="o">??</span> <span class="o">??</span> <span class="mi">32</span> <span class="mo">04</span> <span class="mi">32</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="nl">condition</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    	<span class="mi">1</span> <span class="n">of</span> <span class="n">them</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">rule</span> <span class="n">Pikabot_core</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nl">meta</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    	<span class="n">author</span>      <span class="o">=</span> <span class="s">&#34;Cr4CK3d&#34;</span>
+</span></span><span class="line"><span class="cl">    	<span class="n">description</span> <span class="o">=</span> <span class="s">&#34;Detect Pikabot core&#34;</span>
+</span></span><span class="line"><span class="cl">    	<span class="n">created</span>     <span class="o">=</span> <span class="s">&#34;2024-04-19&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nl">strings</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    	<span class="err">$</span><span class="n">c2_commands</span> <span class="o">=</span> <span class="p">{</span> <span class="mf">6F</span> <span class="mi">24</span> <span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="n">CB</span> <span class="mi">0</span><span class="n">A</span> <span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="mi">6</span><span class="n">C</span> <span class="mo">03</span> <span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="mi">92</span> <span class="mo">07</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    	<span class="err">$</span><span class="n">debug_check</span> <span class="o">=</span> <span class="p">{</span> <span class="n">E8</span> <span class="o">??</span> <span class="o">??</span> <span class="o">??</span> <span class="o">??</span> <span class="mi">3</span><span class="n">D</span> <span class="mo">00</span> <span class="mi">25</span> <span class="mo">00</span> <span class="mo">00</span> <span class="mi">75</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nl">condition</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    	<span class="mi">1</span> <span class="n">of</span> <span class="n">them</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="download">Download
+</h2><p><a class="link" href="https://www.malware-traffic-analysis.net/2024/03/06/index.html"  target="_blank" rel="noopener"
+    >https://www.malware-traffic-analysis.net/2024/03/06/index.html</a></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/investigation/">Investigation</a>
+        
+            <a href="/tags/malware-analysis/">Malware Analysis</a>
+        
+            <a href="/tags/threat-actor/">Threat Actor</a>
+        
+            <a href="/tags/pikabot/">Pikabot</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    <section class="article-lastmod">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+        <span>
+            Last updated on Apr 13, 2024 00:00 UTC
+        </span>
+    </section></footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2020 - 
+        
+        2024 Cr4CK3DD
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.26.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
