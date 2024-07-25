@@ -14,9 +14,6 @@
     <loc>http://localhost:1313/categories/</loc>
     <lastmod>2024-07-23T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/tags/investigation/</loc>
-    <lastmod>2024-07-23T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>http://localhost:1313/tags/malware-analysis/</loc>
     <lastmod>2024-07-23T00:00:00+00:00</lastmod>
   </url><url>
@@ -26,16 +23,22 @@
     <loc>http://localhost:1313/post/</loc>
     <lastmod>2024-07-23T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>http://localhost:1313/tags/stealer/</loc>
+    <lastmod>2024-07-23T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>http://localhost:1313/tags/strelastealer/</loc>
     <lastmod>2024-07-23T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/</loc>
     <lastmod>2024-07-23T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/tags/threat-actor/</loc>
-    <lastmod>2024-07-23T00:00:00+00:00</lastmod>
+    <loc>http://localhost:1313/tags/investigation/</loc>
+    <lastmod>2024-04-13T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/pikabot/</loc>
+    <lastmod>2024-04-13T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/threat-actor/</loc>
     <lastmod>2024-04-13T00:00:00+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/archives/</loc>

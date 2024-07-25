@@ -212,10 +212,11 @@
     <li><a href="#unpacking">Unpacking</a></li>
     <li><a href="#strelastealer">StrelaStealer</a>
       <ol>
-        <li><a href="#steal-thunderbird-credentials">Steal Thunderbird Credentials</a></li>
-        <li><a href="#steal-outlook-credentials">Steal Outlook Credentials</a></li>
+        <li><a href="#steals-thunderbird-credentials">Steals Thunderbird Credentials</a></li>
+        <li><a href="#steals-outlook-credentials">Steals Outlook Credentials</a></li>
       </ol>
     </li>
+    <li><a href="#iocs">IOCs</a></li>
   </ol>
 </nav>
         </div>
@@ -453,7 +454,7 @@
 		data-flex-basis="789px"
 	
 ></p>
-<h3 id="steal-thunderbird-credentials">Steal Thunderbird Credentials
+<h3 id="steals-thunderbird-credentials">Steals Thunderbird Credentials
 </h3><p>StrelaStealer searches for <strong>logins.json</strong> and <strong>key4.db</strong> files within the <strong>%APPDATA%\Thunderbird\Profiles</strong> directory. If those files exist, it encrypts and sends them to the C2 server.</p>
 <p><img src="/p/strelastealer-float-like-a-butterfly-sting-like-a-bee/searching-for-logins-and-key4-files.png"
 	width="838"
@@ -512,7 +513,7 @@
 		data-flex-basis="351px"
 	
 ></p>
-<h3 id="steal-outlook-credentials">Steal Outlook Credentials
+<h3 id="steals-outlook-credentials">Steals Outlook Credentials
 </h3><p>StrelaStealer checks for the presence of the registry key “SOFTWARE\Microsoft\Office\16.0\Outlook\Profiles\Outlook\9375CFF0413111d3B88A00104B2A6676\”. The information about email accounts is stored in subfolders under this key. All of this information is retrieved by enumerating the registry key. The information is then sent to the same IP address.</p>
 <p><img src="/p/strelastealer-float-like-a-butterfly-sting-like-a-bee/check-reg-key.png"
 	width="959"
@@ -556,7 +557,22 @@
 		data-flex-basis="2022px"
 	
 ></p>
-
+<h2 id="iocs">IOCs
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">sha256 (packed): 311d9f8c68e5661348e97b7e483e7ea1b3fc08863bb3f5f585581ef081058399
+</span></span><span class="line"><span class="cl">sha256 (unpacked): 780de0ba17cf12e9a6353de26c06db6fd24428041f71cca960fc561ebbedaa45
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">http[:]//45.9.74[.]32/out.php
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
 </section>
 
 
