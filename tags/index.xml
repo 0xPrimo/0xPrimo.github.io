@@ -1,59 +1,10 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-    <channel>
-        <title>Tags on Cr4CK3DD</title>
-        <link>http://localhost:1313/tags/</link>
-        <description>Recent content in Tags on Cr4CK3DD</description>
-        <generator>Hugo -- gohugo.io</generator>
-        <language>en-us</language>
-        <lastBuildDate>Tue, 23 Jul 2024 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" /><item>
-        <title>Malware Analysis</title>
-        <link>http://localhost:1313/tags/malware-analysis/</link>
-        <pubDate>Tue, 23 Jul 2024 00:00:00 +0000</pubDate>
-        
-        <guid>http://localhost:1313/tags/malware-analysis/</guid>
-        <description></description>
-        </item>
-        <item>
-        <title>Stealer</title>
-        <link>http://localhost:1313/tags/stealer/</link>
-        <pubDate>Tue, 23 Jul 2024 00:00:00 +0000</pubDate>
-        
-        <guid>http://localhost:1313/tags/stealer/</guid>
-        <description></description>
-        </item>
-        <item>
-        <title>StrelaStealer</title>
-        <link>http://localhost:1313/tags/strelastealer/</link>
-        <pubDate>Tue, 23 Jul 2024 00:00:00 +0000</pubDate>
-        
-        <guid>http://localhost:1313/tags/strelastealer/</guid>
-        <description></description>
-        </item>
-        <item>
-        <title>Investigation</title>
-        <link>http://localhost:1313/tags/investigation/</link>
-        <pubDate>Sat, 13 Apr 2024 00:00:00 +0000</pubDate>
-        
-        <guid>http://localhost:1313/tags/investigation/</guid>
-        <description></description>
-        </item>
-        <item>
-        <title>Pikabot</title>
-        <link>http://localhost:1313/tags/pikabot/</link>
-        <pubDate>Sat, 13 Apr 2024 00:00:00 +0000</pubDate>
-        
-        <guid>http://localhost:1313/tags/pikabot/</guid>
-        <description></description>
-        </item>
-        <item>
-        <title>Threat Actor</title>
-        <link>http://localhost:1313/tags/threat-actor/</link>
-        <pubDate>Sat, 13 Apr 2024 00:00:00 +0000</pubDate>
-        
-        <guid>http://localhost:1313/tags/threat-actor/</guid>
-        <description></description>
-        </item>
-        
-    </channel>
+  <channel>
+    <title>Tags on 0xPrimo</title>
+    <link>http://localhost:1313/tags/</link>
+    <description>Recent content in Tags on 0xPrimo</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language><atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
+  </channel>
 </rss>
