@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en-gb"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title itemprop="name">StrelaStealer: Float like a butterfly, sting like a bee | 0xPrimo</title>
+<meta property="og:title" content="StrelaStealer: Float like a butterfly, sting like a bee | 0xPrimo" />
+<meta name="twitter:title" content="StrelaStealer: Float like a butterfly, sting like a bee | 0xPrimo" />
+<meta itemprop="name" content="StrelaStealer: Float like a butterfly, sting like a bee | 0xPrimo" />
+<meta name="application-name" content="StrelaStealer: Float like a butterfly, sting like a bee | 0xPrimo" />
+<meta property="og:site_name" content="" />
+
+<meta name="description" content="Minimal Hugo blog theme with light and dark mode support">
+<meta itemprop="description" content="Minimal Hugo blog theme with light and dark mode support" />
+<meta property="og:description" content="Minimal Hugo blog theme with light and dark mode support" />
+<meta name="twitter:description" content="Minimal Hugo blog theme with light and dark mode support" />
+
+<meta property="og:locale" content="en-gb" />
+<meta name="language" content="en-gb" />
+
+  <link rel="alternate" hreflang="en-gb" href="http://localhost:1313/posts/strelastealer-analysis/" title="English" />
+
+
+<meta itemprop="image" content="http://localhost:1313/cover.jpeg" />
+<meta property="og:image" content="http://localhost:1313/cover.jpeg" />
+<meta name="twitter:image" content="http://localhost:1313/cover.jpeg" />
+<meta name="twitter:image:src" content="http://localhost:1313/cover.jpeg" />
+
+
+    
+    
+    
+
+    <meta property="og:type" content="article" />
+    <meta property="og:article:published_time" content=2024-07-23T00:00:00Z />
+    <meta property="article:published_time" content=2024-07-23T00:00:00Z />
+    <meta property="og:url" content="http://localhost:1313/posts/strelastealer-analysis/" />
+
+    
+    <meta property="og:article:author" content="" />
+    <meta property="article:author" content="" />
+    <meta name="author" content="" />
+    
+    
+
+    
+
+    <script defer type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "Article",
+        "headline": "StrelaStealer: Float like a butterfly, sting like a bee",
+        "author": {
+        "@type": "Person",
+        "name": ""
+        },
+        "datePublished": "2024-07-23",
+        "description": "",
+        "wordCount":  345 ,
+        "mainEntityOfPage": "True",
+        "dateModified": "2024-07-23",
+        "image": {
+        "@type": "imageObject",
+        "url": "http:\/\/localhost:1313\/cover.jpeg"
+        },
+        "publisher": {
+        "@type": "Organization",
+        "name": "0xPrimo"
+        }
+    }
+    </script>
+
+
+<meta name="generator" content="Hugo 0.129.0">
+
+    
+    <meta property="og:url" content="http://localhost:1313/posts/strelastealer-analysis/">
+  <meta property="og:site_name" content="0xPrimo">
+  <meta property="og:title" content="StrelaStealer: Float like a butterfly, sting like a bee">
+  <meta property="og:description" content="Executive Summary StrelaStealer is a Malware Stealer that has been out since 2022. it steals Outlook and Thunderbird credentials. StrelaStealer searches for “logins.json” (account/password) and “key4.db” (password database) within the “%APPDATA%\Thunderbird\Profiles&#34; directory to acquire the credentials for Thunderbird. StrelaStealer seeks out the Windows Registry from where it can retrieve the program’s key and “IMAP User”, “IMAP Server”, as well as the “IMAP Password” values. Since the latter is kept in an encrypted form, the malicious program employs the Windows CryptUnprotectData feature to decrypt it prior to exfiltration.">
+  <meta property="og:locale" content="en_gb">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-07-23T00:00:00+00:00">
+    <meta property="article:modified_time" content="2024-07-23T00:00:00+00:00">
+    <meta property="article:tag" content="Malware Analysis">
+    <meta property="article:tag" content="StrelaStealer">
+    <meta property="article:tag" content="Stealer">
+    <meta property="og:image" content="http://localhost:1313/posts/strelastealer-analysis/cover.jpeg">
+
+
+    
+    
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="http://localhost:1313/posts/strelastealer-analysis/cover.jpeg">
+  <meta name="twitter:title" content="StrelaStealer: Float like a butterfly, sting like a bee">
+  <meta name="twitter:description" content="Executive Summary StrelaStealer is a Malware Stealer that has been out since 2022. it steals Outlook and Thunderbird credentials. StrelaStealer searches for “logins.json” (account/password) and “key4.db” (password database) within the “%APPDATA%\Thunderbird\Profiles&#34; directory to acquire the credentials for Thunderbird. StrelaStealer seeks out the Windows Registry from where it can retrieve the program’s key and “IMAP User”, “IMAP Server”, as well as the “IMAP Password” values. Since the latter is kept in an encrypted form, the malicious program employs the Windows CryptUnprotectData feature to decrypt it prior to exfiltration.">
+
+
+    
+
+    <link rel="canonical" href="http://localhost:1313/posts/strelastealer-analysis/">
+    <link href="/style.min.2d921c18cf1ec555ffc03d59a8adc211c402c68c930c27d6a0c306ab175a8d09.css" rel="stylesheet">
+    <link href="/code-highlight.min.706d31975fec544a864cb7f0d847a73ea55ca1df91bf495fd12a177138d807cf.css" rel="stylesheet">
+
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg">
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+
+<link rel="manifest" href="http://localhost:1313/site.webmanifest">
+
+<meta name="msapplication-config" content="/browserconfig.xml">
+<meta name="msapplication-TileColor" content="#2d89ef">
+<meta name="theme-color" content="#434648">
+
+    
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+
+    
+    
+</head>
+<body data-theme = "dark" class="notransition">
+
+<script src="/js/theme.js"></script>
+
+<div class="navbar" role="navigation">
+    <nav class="menu" aria-label="Main Navigation">
+        <a href="http://localhost:1313/" class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" 
+viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+stroke-linejoin="round" class="feather feather-home">
+<title>Home</title>
+<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+<polyline points="9 22 9 12 15 12 15 22"></polyline>
+</svg>
+        </a>
+        <input type="checkbox" id="menu-trigger" class="menu-trigger" />
+        <label for="menu-trigger">
+            <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" stroke="currentColor" fill="none" viewBox="0 0 14 14"><title>Menu</title><path stroke-linecap="round" stroke-linejoin="round" d="M10.595 7L3.40726 7"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 3.51488L3.49301 3.51488"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 10.4851H3.49301"></path><path stroke-linecap="round" stroke-linejoin="round" d="M0.5 12.5V1.5C0.5 0.947715 0.947715 0.5 1.5 0.5H12.5C13.0523 0.5 13.5 0.947715 13.5 1.5V12.5C13.5 13.0523 13.0523 13.5 12.5 13.5H1.5C0.947715 13.5 0.5 13.0523 0.5 12.5Z"></path></svg>
+            </span>
+        </label>
+
+        <div class="trigger">
+            <ul class="trigger-container">
+                
+                
+                <li>
+                    <a class="menu-link " href="/">
+                        Home
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link active" href="/posts/">
+                        Posts
+                    </a>
+                    
+                </li>
+                
+                <li class="menu-separator">
+                    <span>|</span>
+                </li>
+                
+                
+            </ul>
+            <a id="mode" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-sunny" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>LIGHT</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-moon" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>DARK</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<div class="wrapper post">
+    <main class="page-content" aria-label="Content">
+        <article>
+            <header class="header">
+                <h1 class="header-title">StrelaStealer: Float like a butterfly, sting like a bee</h1>
+                
+                
+                
+                <div class="post-meta">
+                    <time datetime="2024-07-23T00:00:00&#43;00:00" itemprop="datePublished"> 23 Jul 2024 </time>
+                </div>
+                
+            </header>
+            
+    
+    <details class="toc" ZgotmplZ>
+        <summary><b>Table of Contents</b></summary>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#unpacking">Unpacking</a></li>
+    <li><a href="#strelastealer">StrelaStealer</a>
+      <ul>
+        <li><a href="#steals-thunderbird-credentials">Steals Thunderbird Credentials</a></li>
+        <li><a href="#steals-outlook-credentials">Steals Outlook Credentials</a></li>
+      </ul>
+    </li>
+    <li><a href="#iocs">IOCs</a></li>
+  </ul>
+</nav>
+    </details>
+            <div class="page-content">
+                <h1 id="executive-summary">Executive Summary</h1>
+<ul>
+<li>StrelaStealer is a Malware Stealer that has been out since 2022. it steals Outlook and Thunderbird credentials.</li>
+<li>StrelaStealer searches for &ldquo;logins.json&rdquo; (account/password) and &ldquo;key4.db&rdquo; (password database) within the &ldquo;%APPDATA%\Thunderbird\Profiles&quot; directory to acquire the credentials for Thunderbird.</li>
+<li>StrelaStealer seeks out the Windows Registry from where it can retrieve the program&rsquo;s key and &ldquo;IMAP User&rdquo;, &ldquo;IMAP Server&rdquo;, as well as the &ldquo;IMAP Password&rdquo; values. Since the latter is kept in an encrypted form, the malicious program employs the Windows CryptUnprotectData feature to decrypt it prior to exfiltration.</li>
+</ul>
+<h1 id="analysis">Analysis</h1>
+<p>Looking at the DLL sections, we can see that the entropy of the data section is high, indicating that it&rsquo;s packed.</p>
+<p><img alt="Figure 1: data section entropy" src="/posts/strelastealer-analysis/open-packed-sample-with-die.png"></p>
+<h2 id="unpacking">Unpacking</h2>
+<p>StrelaStealer stores the next stage in the data section. The first 4 bytes represent the payload size, followed by a 1024-byte XOR key, and then the encrypted PE file.</p>
+<p><img alt="Figure 2: Payload stored in data section" src="/posts/strelastealer-analysis/payload-stored-in-data-section.png"></p>
+<p><img alt="Figure 3: Decryption loop" src="/posts/strelastealer-analysis/decryption-loop.png"></p>
+<p>For unpacking i wrote the following python script:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">pefile</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">struct</span> <span class="kn">import</span> <span class="n">unpack</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">readdword</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&lt;I&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">pe</span> <span class="o">=</span> <span class="n">pefile</span><span class="o">.</span><span class="n">PE</span><span class="p">(</span><span class="s2">&#34;311d9f8c68e5661348e97b7e483e7ea1b3fc08863bb3f5f585581ef081058399.dll&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">data_section</span> <span class="o">=</span> <span class="kc">None</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">pe</span><span class="o">.</span><span class="n">sections</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">section</span><span class="o">.</span><span class="n">Name</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;.data&#39;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">data_section</span> <span class="o">=</span> <span class="n">section</span>
+</span></span><span class="line"><span class="cl">        <span class="k">break</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="n">data_section</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">raw_data</span> <span class="o">=</span> <span class="n">data_section</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;Extracted .data section raw data:&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">payload_size</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&lt;I&#39;</span><span class="p">,</span> <span class="n">raw_data</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">xor_key</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">1028</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="n">encrypted_data</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[</span><span class="mi">1028</span><span class="p">:</span><span class="mi">1028</span><span class="o">+</span><span class="n">payload_size</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">out</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">payload_size</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">encrypted_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">^</span> <span class="n">xor_key</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">xor_key</span><span class="p">)]</span> <span class="o">^</span> <span class="mh">0xc</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;unpakced.bin&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+</span></span></code></pre></div><p>After decryption the DLL inject itself with the decrypted PE file.
+<img alt="Figure 4: Process Injection" src="/posts/strelastealer-analysis/process-injection.png"></p>
+<h2 id="strelastealer">StrelaStealer</h2>
+<p>StrelaStealer starts by checking the system language ID with the API <strong>GetKeyboardLayout</strong>. It infects victims from Germany, Spain, Italy, and Poland.</p>
+<p><img alt="Figure 5: StrelaStealer check infected systems language id" src="/posts/strelastealer-analysis/check-system-langid.png"></p>
+<h3 id="steals-thunderbird-credentials">Steals Thunderbird Credentials</h3>
+<p>StrelaStealer searches for <strong>logins.json</strong> and <strong>key4.db</strong> files within the <strong>%APPDATA%\Thunderbird\Profiles</strong> directory. If those files exist, it encrypts and sends them to the C2 server.</p>
+<p><img alt="Figure 6: Search for logins.json and key4.db files" src="/posts/strelastealer-analysis/searching-for-logins-and-key4-files.png"></p>
+<p><img alt="Figure 7: Thunderbird data before encryption" src="/posts/strelastealer-analysis/Structure-of-sended-data-before-ecnryption.png"></p>
+<p><img alt="Figure 8: Encrypting Thunderbird data" src="/posts/strelastealer-analysis/ecnrypt-payload.png"></p>
+<p>It keeps sending Thunderbird credentials until it receives the <em>KH</em> command from the C2 server.</p>
+<p><img alt="Figure 10: Beaconing" src="/posts/strelastealer-analysis/beaconing.png"></p>
+<h3 id="steals-outlook-credentials">Steals Outlook Credentials</h3>
+<p>StrelaStealer checks for the presence of the registry key “SOFTWARE\Microsoft\Office\16.0\Outlook\Profiles\Outlook\9375CFF0413111d3B88A00104B2A6676\”. The information about email accounts is stored in subfolders under this key. All of this information is retrieved by enumerating the registry key. The information is then sent to the same IP address.</p>
+<p><img alt="Figure 11: Open target registry key" src="/posts/strelastealer-analysis/check-reg-key.png"></p>
+<p><img alt="Figure 12: Collecting registry key values" src="/posts/strelastealer-analysis/extracting-registry-values.png"></p>
+<p><img alt="Figure 13: Outlook data before encryption" src="/posts/strelastealer-analysis/outlook-data-structure.png"></p>
+<h2 id="iocs">IOCs</h2>
+<pre tabindex="0"><code>sha256 (packed): 311d9f8c68e5661348e97b7e483e7ea1b3fc08863bb3f5f585581ef081058399
+sha256 (unpacked): 780de0ba17cf12e9a6353de26c06db6fd24428041f71cca960fc561ebbedaa45
+
+http[:]//45.9.74[.]32/out.php
+</code></pre>
+            </div>
+        </article></main>
+</div>
+<footer class="footer">
+    <span class="footer_item"> </span>
+    &nbsp;
+
+    <div class="footer_social-icons">
+<a href="https://github.com/0xPrimo" target="_blank" rel="noopener noreferrer me"
+    title="Github">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+    </path>
+</svg>
+</a>
+<a href="https://x.com/cr4ckeddd" target="_blank" rel="noopener noreferrer me"
+    title="Twitter">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z">
+    </path>
+</svg>
+</a>
+</div>
+    <small class="footer_copyright">
+        © 2025 .
+        
+    </small>
+</footer><a href="#" title="Go to top" id="totop">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" stroke="currentColor" viewBox="0 96 960 960">
+    <path d="M283 704.739 234.261 656 480 410.261 725.739 656 677 704.739l-197-197-197 197Z"/>
+</svg>
+
+</a>
+
+
+    
+
+
+
+
+    
+    
+        
+    
+
+    
+    
+        
+    
+
+
+
+    
+    <script async src="http://localhost:1313/js/main.js" ></script>
+
+    
+
+</body>
+</html>

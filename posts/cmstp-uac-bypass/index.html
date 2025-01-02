@@ -53,7 +53,7 @@
         },
         "datePublished": "2024-11-02",
         "description": "",
-        "wordCount":  278 ,
+        "wordCount":  267 ,
         "mainEntityOfPage": "True",
         "dateModified": "2024-11-02",
         "image": {
@@ -74,8 +74,8 @@
     <meta property="og:url" content="http://localhost:1313/posts/cmstp-uac-bypass/">
   <meta property="og:site_name" content="0xPrimo">
   <meta property="og:title" content="Cmstp UAC Bypass">
-  <meta property="og:description" content="Introduction While i was looking for a way to bypass UAC (User Account Control) i came across a LOLBIN (Living of the land binary) called cmstp.exe that can be abused to bypass UAC and execute arbitrary commands through an auto-elevated COM interface.
-Abusing CMSTP.EXE Running cmstp.exe with the following config will spwan an elevated cmd.exe.
+  <meta property="og:description" content="Introduction While i was looking for a way to bypass UAC (User Account Control) i came across cmstp.exe which is a LOLBIN (Living of the land binary) that can be abused to bypass UAC and execute arbitrary commands through an auto-elevated COM interface.
+Abusing CMSTP.EXE Running cmstp.exe with the following config will spawn an elevated cmd.exe.
 [version] Signature=$chicago$ [DefaultInstall] RunPreSetupCommands=RunPreSetupCommandsSection [RunPreSetupCommandsSection] C:\Windows\System32\cmd.exe [Strings] ServiceName=&#34;EVIL&#34; ShortSvcName=&#34;EVIL&#34; Hurdle: User Options Box The issue is that the user must select All users option then click OK in order to spawn the elevated cmd.">
   <meta property="og:locale" content="en_gb">
   <meta property="og:type" content="article">
@@ -88,8 +88,8 @@ Abusing CMSTP.EXE Running cmstp.exe with the following config will spwan an elev
     
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Cmstp UAC Bypass">
-  <meta name="twitter:description" content="Introduction While i was looking for a way to bypass UAC (User Account Control) i came across a LOLBIN (Living of the land binary) called cmstp.exe that can be abused to bypass UAC and execute arbitrary commands through an auto-elevated COM interface.
-Abusing CMSTP.EXE Running cmstp.exe with the following config will spwan an elevated cmd.exe.
+  <meta name="twitter:description" content="Introduction While i was looking for a way to bypass UAC (User Account Control) i came across cmstp.exe which is a LOLBIN (Living of the land binary) that can be abused to bypass UAC and execute arbitrary commands through an auto-elevated COM interface.
+Abusing CMSTP.EXE Running cmstp.exe with the following config will spawn an elevated cmd.exe.
 [version] Signature=$chicago$ [DefaultInstall] RunPreSetupCommands=RunPreSetupCommandsSection [RunPreSetupCommandsSection] C:\Windows\System32\cmd.exe [Strings] ServiceName=&#34;EVIL&#34; ShortSvcName=&#34;EVIL&#34; Hurdle: User Options Box The issue is that the user must select All users option then click OK in order to spawn the elevated cmd.">
 
 
@@ -214,9 +214,9 @@ stroke-linejoin="round" class="feather feather-home">
     </details>
             <div class="page-content">
                 <h2 id="introduction">Introduction</h2>
-<p>While i was looking for a way to bypass UAC (User Account Control) i came across a LOLBIN (Living of the land binary) called <code>cmstp.exe</code> that can be abused to bypass UAC and execute arbitrary commands through an auto-elevated COM interface.</p>
+<p>While i was looking for a way to bypass UAC (User Account Control) i came across <code>cmstp.exe</code> which is a LOLBIN (Living of the land binary) that can be abused to bypass UAC and execute arbitrary commands through an auto-elevated COM interface.</p>
 <h3 id="abusing-cmstpexe">Abusing CMSTP.EXE</h3>
-<p>Running <code>cmstp.exe</code> with the following config will spwan an elevated <code>cmd.exe</code>.</p>
+<p>Running <code>cmstp.exe</code> with the following config will spawn an elevated <code>cmd.exe</code>.</p>
 <pre tabindex="0"><code>[version]
 Signature=$chicago$
 
@@ -235,10 +235,9 @@ ShortSvcName=&#34;EVIL&#34;
 <h2 id="analyzing-cmstpexe">Analyzing CMSTP.EXE</h2>
 <p>As a starter I&rsquo;ve attached x64dbg to <code>cmstp.exe</code> and examined the threads call stack.</p>
 <p><img alt="call-stack" src="/cmstp/x64dbg.png"></p>
-<p>As you can see <code>cmstp.exe</code> calls <code>DialogBoxParamW</code> to display the options box, this is a very useful information because after opening <code>cmstp.exe</code> on IDA we&rsquo;ll just take a look where this API get referenced.</p>
+<p>As you can see <code>cmstp.exe</code> calls <code>DialogBoxParamW</code> to display the options box, this is a very useful information because after opening <code>cmstp.exe</code> on IDA we&rsquo;ll just need to take a look where this API get referenced.</p>
 <p><img alt="ida-xref" src="/cmstp/ida-xref.png"></p>
-<p>IDA found the debugging symbols of the binary, this will speed up the analysis.</p>
-<p><code>DialogBoxParamW</code> is been called from two functions, the one we&rsquo;ll be interesting to analyze is  <code>GetInstallOptions</code>.</p>
+<p>After IDA loads debugging symbols we can that <code>DialogBoxParamW</code> is called from two functions, the one we&rsquo;ll be interesting to analyze is  <code>GetInstallOptions</code>.</p>
 <p>i&rsquo;ve created this graph to show the execution flow of <code>GetInstallOptions</code>.</p>
 <p><img alt="get-install-option-graph" src="/cmstp/get-install-option-graph.jpg"></p>
 <p>As you can see from the graph, there is two ways to create an elevated COM interface. from user options box or the process is already elevated.</p>
@@ -258,7 +257,7 @@ ShortSvcName=&#34;EVIL&#34;
 <img alt="after-patch" src="/cmstp/after-patch.png"></p>
 </li>
 </ul>
-<p>The source code of the patch can be found <a href="https://github.com/0xPrimo/Cmstp-UAC-Bypass">here</a></p>
+<p>source code <a href="https://github.com/0xPrimo/Cmstp-UAC-Bypass">here</a></p>
 <h2 id="references">References</h2>
 <ul>
 <li><a href="https://attack.mitre.org/techniques/T1218/003/">System Binary Proxy Execution: CMSTP</a></li>
@@ -294,7 +293,7 @@ ShortSvcName=&#34;EVIL&#34;
 </a>
 </div>
     <small class="footer_copyright">
-        © 2024 .
+        © 2025 .
         
     </small>
 </footer><a href="#" title="Go to top" id="totop">

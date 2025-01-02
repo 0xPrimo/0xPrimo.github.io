@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Investigation on 0xPrimo</title>
+    <link>http://localhost:1313/tags/investigation/</link>
+    <description>Recent content in Investigation on 0xPrimo</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Sat, 13 Apr 2024 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/investigation/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>PikaBot: Unmasking Its Deep Secrets</title>
+      <link>http://localhost:1313/posts/pikabot-analysis/</link>
+      <pubDate>Sat, 13 Apr 2024 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/pikabot-analysis/</guid>
+      
+      <description>Overview PikaBot is a malware loader, widely distributed since February 2023, that is used by Initial Access Brokers (IABs) to establish an initial foothold within a victim’s networks and to distribute additional payloads such as Cobalt Strike and Meterpreter. Since its emergence in early 2023, PikaBot appears to be in active development, with a new major version released in February 2024. The malware employs advanced anti-analysis techniques to evade detection and harden analysis, including system checks, indirect syscalls, encryption of next-stage and strings, and dynamic API resolving.</description>
+      
+    </item>
+    
+  </channel>
+</rss>

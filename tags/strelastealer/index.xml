@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>StrelaStealer on 0xPrimo</title>
+    <link>http://localhost:1313/tags/strelastealer/</link>
+    <description>Recent content in StrelaStealer on 0xPrimo</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Tue, 23 Jul 2024 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/strelastealer/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>StrelaStealer: Float like a butterfly, sting like a bee</title>
+      <link>http://localhost:1313/posts/strelastealer-analysis/</link>
+      <pubDate>Tue, 23 Jul 2024 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/strelastealer-analysis/</guid>
+      
+      <description>Executive Summary StrelaStealer is a Malware Stealer that has been out since 2022. it steals Outlook and Thunderbird credentials. StrelaStealer searches for &amp;ldquo;logins.json&amp;rdquo; (account/password) and &amp;ldquo;key4.db&amp;rdquo; (password database) within the &amp;ldquo;%APPDATA%\Thunderbird\Profiles&amp;quot; directory to acquire the credentials for Thunderbird. StrelaStealer seeks out the Windows Registry from where it can retrieve the program&amp;rsquo;s key and &amp;ldquo;IMAP User&amp;rdquo;, &amp;ldquo;IMAP Server&amp;rdquo;, as well as the &amp;ldquo;IMAP Password&amp;rdquo; values. Since the latter is kept in an encrypted form, the malicious program employs the Windows CryptUnprotectData feature to decrypt it prior to exfiltration.</description>
+      
+    </item>
+    
+  </channel>
+</rss>
